@@ -1,5 +1,5 @@
 
-const CACHE_NAME = "satranc-pwa-v3";
+const CACHE_NAME = "satranc-pwa-v4";
 
 const FILES = [
   "./",
