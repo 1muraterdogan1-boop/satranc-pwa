@@ -1,100 +1,37 @@
 
-"use strict";
+window.ChessCoach = {
+  greeting() {
+    return "Satranç koçuna hoş geldin! Güzel bir oyun dilerim.";
+  },
 
-const ChessCoach = (() => {
-  const values = {
-    p: 100,
-    n: 320,
-    b: 330,
-    r: 500,
-    q: 900,
-    k: 20000
-  };
+  getMoveCount(game) {
+    return game.history().length;
+  },
 
-  function evaluate(game) {
-    const board = game.board();
-    let score = 0;
+  getTurn(game) {
+    return game.turn() === "w" ? "Beyaz" : "Siyah";
+  },
 
-    board.forEach(row => {
-      row.forEach(piece => {
-        if (!piece) return;
-
-        const value = values[piece.type] || 0;
-        score += piece.color === "w" ? value : -value;
-      });
-    });
-
-    return score;
-  }
-
-  function getAdvice(game) {
-    if (game.isCheckmate()) {
+  getAdvice(game) {
+    if (game.in_checkmate()) {
       return "Şah mat! Oyun sona erdi.";
     }
 
-    if (game.isDraw()) {
-      return "Oyun berabere sonuçlandı.";
+    if (game.in_draw()) {
+      return "Oyun berabere.";
     }
 
-    if (game.isCheck()) {
-      return "Dikkat! Şahın tehdit altında. Öncelikle şahını güvene almalısın.";
+    if (game.in_check()) {
+      return "Dikkat! Şahın tehdit altında.";
     }
 
     const moves = game.moves({ verbose: true });
 
-    if (!moves.length) {
-      return "Yasal hamle kalmadı.";
+    if (moves.length === 0) {
+      return "Yasal hamle bulunamadı.";
     }
 
-    const captures = moves.filter(move => move.captured);
-    const promotions = moves.filter(move => move.promotion);
-
-    if (promotions.length) {
-      return "Piyonlarından biri terfi edebilir. Terfi fırsatını değerlendir!";
-    }
-
-    if (captures.length) {
-      return "Taş alma fırsatın var. Ancak karşı tarafın cevabını da hesapla.";
-    }
-
-    return "Taşlarını geliştir, merkezin kontrolünü koru ve şah güvenliğine dikkat et.";
+    return "Önerilen hamle: " +
+      moves[0].from + " → " + moves[0].to;
   }
-
-  function getReport(game) {
-    const history = game.history();
-    const score = evaluate(game);
-
-    return {
-      totalMoves: history.length,
-      materialBalance: score,
-      advice: getAdvice(game),
-      result: game.isCheckmate()
-        ? "Şah mat"
-        : game.isDraw()
-          ? "Beraberlik"
-          : "Oyun devam ediyor"
-    };
-  }
-
-  return {
-    evaluate,
-    getAdvice,
-    getReport
-  };
-})();
-
-// Koçun tavsiyesini ekranda göster.
-function coachAdvice() {
-  $("coachMessage").textContent =
-    ChessCoach.getAdvice(game);
-}
-
-// Oyun raporunu güncelle.
-function coachReport() {
-  const report = ChessCoach.getReport(game);
-
-  $("gameReport").textContent =
-    "Durum: " + report.result +
-    " | Toplam yarım hamle: " + report.totalMoves +
-    " | Materyal dengesi: " + report.materialBalance;
-}
+};
