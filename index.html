@@ -1,0 +1,82 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#17251f">
+  <meta name="description" content="Çevrimdışı oynanabilen satranç uygulaması">
+  <title>Premium Satranç</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <header>
+      <h1>♟ Premium Satranç</h1>
+      <p>Satranç öğren, oyna ve geliş.</p>
+    </header>
+
+    <section class="game">
+      <div id="status" aria-live="polite">
+        Beyazın sırası
+      </div>
+
+      <div id="board" class="board"></div>
+
+      <div class="controls">
+        <button id="newGameBtn">Yeni Oyun</button>
+        <button id="undoBtn">Geri Al</button>
+        <button id="flipBtn">Tahtayı Çevir</button>
+      </div>
+
+      <div class="settings">
+        <label for="difficulty">Bilgisayar Seviyesi</label>
+        <select id="difficulty">
+          <option value="1">Seviye 1 - Kolay</option>
+          <option value="2">Seviye 2</option>
+          <option value="3" selected>Seviye 3 - Orta</option>
+          <option value="4">Seviye 4</option>
+          <option value="5">Seviye 5 - Zor</option>
+        </select>
+      </div>
+
+      <div class="coach">
+        <h2>Satranç Koçu</h2>
+        <p id="coachMessage">Oyuna hazır mısın?</p>
+        <button id="hintBtn">İpucu</button>
+        <button id="analyzeBtn">Analiz Et</button>
+        <button id="reportBtn">Rapor</button>
+      </div>
+
+      <div class="history">
+        <h2>Hamle Geçmişi</h2>
+        <div id="moveHistory"></div>
+      </div>
+
+      <div class="captured">
+        <h2>Alınan Taşlar</h2>
+        <div id="capturedWhite"></div>
+        <div id="capturedBlack"></div>
+      </div>
+    </section>
+
+    <footer>
+      <p>Premium Satranç · Çevrimdışı oyun desteği</p>
+    </footer>
+  </main>
+
+  <script src="vendor/chess.min.js"></script>
+  <script src="app.js"></script>
+  <script src="coach.js"></script>
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./service-worker.js")
+          .catch(error => console.error(error));
+      });
+    }
+  </script>
+</body>
+</html>
