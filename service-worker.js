@@ -1,12 +1,15 @@
 
-const CACHE_NAME = "satranc-pwa-v5";
+const CACHE_NAME = "satranc-pwa-v6";
+const ENGINE_CACHE = "satranc-stockfish-engine-v1";
 
 const FILES = [
-  "./satranc-motor.js",
   "./",
   "./index.html",
   "./manifest.json",
   "./vendor/chess.min.js",
+  "./satranc-eklentisi.js",
+  "./satranc-motor.js",
+  "./stockfish-adapter.js",
   "./icon-192.png",
   "./icon-512.png"
 ];
@@ -23,7 +26,9 @@ self.addEventListener("activate", event => {
     caches.keys().then(keys =>
       Promise.all(
         keys
-          .filter(key => key !== CACHE_NAME)
+          .filter(key =>
+            key !== CACHE_NAME && key !== ENGINE_CACHE
+          )
           .map(key => caches.delete(key))
       )
     )
