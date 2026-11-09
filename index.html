@@ -239,7 +239,9 @@ function tapSquare(name){
  const m=legal.find(x=>x.to===name);
  if(m){
  let promotion="q";
- if(m.promotion){let a=prompt("Piyon hangi taşa dönüşsün? q=Vezir, r=Kale, b=Fil, n=At","q");a=(a||"q").toLowerCase();promotion=["q","r","b","n"].includes(a)?a:"q"}
+ if(m.promotion){let a=prompt("Piyon hangi taşa dönüşsün? V=Vezir, K=Kale, F=Fil, A=At","V");
+a=(a||"V").toUpperCase();
+promotion=({V:"q",K:"r",F:"b",A:"n"})[a]||"q"; a=(a||"q").toLowerCase();promotion=["q","r","b","n"].includes(a)?a:"q"}
  hintMove=null;playMove({from:selected,to:name,promotion});return;
  }
  }
