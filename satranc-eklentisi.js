@@ -298,4 +298,6 @@
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"><defs><linearGradient id="piece-${type}-${color}" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${white ? "#fffdf5" : "#92999e"}"/><stop offset="48%" stop-color="${fill}"/><stop offset="100%" stop-color="${white ? "#a58a60" : "#080a0c"}"/></linearGradient></defs><g fill="url(#piece-${type}-${color})">${art}</g></svg>`;
   };
 
+    // Taş tasarımlarını ilk açılışta hemen göster.
+  if (typeof window.draw === "function") window.draw();
 })();
