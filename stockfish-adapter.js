@@ -114,14 +114,14 @@
   }
 
   function searchDepth() {
-    const level = Number(
-      document.getElementById("level")?.value || 3
-    );
+  const level = Number(
+    document.getElementById("level")?.value || 3
+  );
 
-    return [0, 7, 9, 12, 15, 17][
-      Math.max(1, Math.min(5, level))
-    ];
-  }
+  return [0, 10, 14, 18, 22, 24][
+    Math.max(1, Math.min(5, level))
+  ];
+}
 
   window.computerMove = async function () {
     if (!game || game.game_over() || game.turn() !== "b") return;
