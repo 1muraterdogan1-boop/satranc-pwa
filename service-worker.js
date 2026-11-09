@@ -1,7 +1,8 @@
 
-const CACHE_NAME = "satranc-pwa-v4";
+const CACHE_NAME = "satranc-pwa-v5";
 
 const FILES = [
+  "./satranc-motor.js",
   "./",
   "./index.html",
   "./manifest.json",
