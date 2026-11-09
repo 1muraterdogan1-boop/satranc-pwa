@@ -2,9 +2,21 @@
 (function () {
   "use strict";
 
-  const ENGINE_URL =
-    "https://cdn.jsdelivr.net/npm/stockfish@19.0.1/bin/stockfish-19-asm.js";
   const CACHE_NAME = "satranc-stockfish-engine-v1";
+
+  const REMOTE_JS =
+    "https://cdn.jsdelivr.net/npm/stockfish@19.0.1/bin/stockfish-19-single.js";
+
+  const REMOTE_WASM =
+    "https://cdn.jsdelivr.net/npm/stockfish@19.0.1/bin/stockfish-19-single.wasm";
+
+  const LOCAL_JS = new URL(
+    "./stockfish-19-single.js", location.href
+  ).href;
+
+  const LOCAL_WASM = new URL(
+    "./stockfish-19-single.wasm", location.href
+  ).href;
 
   const fallbackComputerMove = window.computerMove;
   const fallbackGetHint = window.getHint;
@@ -13,115 +25,140 @@
   let readyPromise = null;
   let activeSearch = null;
 
-  function startEngine() {
+  async function saveEngineFile(cache, remote, local, name) {
+    let saved = await cache.match(local);
+
+    if (saved) return;
+
+    if (!navigator.onLine) {
+      throw new Error(name + " henüz indirilmemiş.");
+    }
+
+    if (typeof coachMessage === "function") {
+      coachMessage(name + " indiriliyor. Lütfen bekle...");
+    }
+
+    const response = await fetch(remote);
+
+    if (!response.ok) {
+      throw new Error(name + " indirilemedi.");
+    }
+
+    await cache.put(local, response);
+  }
+
+  async function startEngine() {
     if (readyPromise) return readyPromise;
 
     readyPromise = (async function () {
       const cache = await caches.open(CACHE_NAME);
-      let response = await cache.match(ENGINE_URL);
 
-      if (!response) {
-        if (!navigator.onLine) {
-          throw new Error("Motor henüz indirilmedi.");
-        }
+      await saveEngineFile(
+        cache, REMOTE_JS, LOCAL_JS, "Stockfish JS"
+      );
 
-        response = await fetch(ENGINE_URL);
-        if (!response.ok) throw new Error("Motor indirilemedi.");
+      await saveEngineFile(
+        cache, REMOTE_WASM, LOCAL_WASM, "Stockfish WASM"
+      );
 
-        await cache.put(ENGINE_URL, response.clone());
-      }
+      worker = new Worker(LOCAL_JS);
 
-      const source = await response.text();
-      const blob = new Blob([source], {
-        type: "text/javascript"
-      });
+      await new Promise((resolve, reject) => {
+        let stage = "uci";
 
-      const blobUrl = URL.createObjectURL(blob);
+        const timeout = setTimeout(() => {
+          reject(new Error("Motor başlatılamadı."));
+        }, 120000);
 
-      try {
-        worker = new Worker(blobUrl);
+        worker.onmessage = function (event) {
+          const line = String(event.data || "");
 
-        await new Promise((resolve, reject) => {
-          let stage = "uci";
-
-          const timeout = setTimeout(() => {
-            reject(new Error("Motor başlatma zaman aşımı."));
-          }, 30000);
-
-          worker.onmessage = function (event) {
-            const line = String(event.data || "");
-
-            if (stage === "uci" && line.includes("uciok")) {
-              stage = "ready";
-              worker.postMessage("isready");
-            } else if (
-              stage === "ready" &&
-              line.includes("readyok")
-            ) {
-              clearTimeout(timeout);
-              resolve();
-            } else if (
-              line.startsWith("bestmove ") &&
-              activeSearch
-            ) {
-              const job = activeSearch;
-              activeSearch = null;
-              const move = line.split(/\s+/)[1];
-
-              if (!move || move === "(none)") {
-                job.reject(new Error("Hamle bulunamadı."));
-              } else {
-                job.resolve(move);
-              }
-            }
-          };
-
-          worker.onerror = function (error) {
+          if (stage === "uci" && line.includes("uciok")) {
+            stage = "ready";
+            worker.postMessage("setoption name Hash value 64");
+            worker.postMessage("isready");
+          } else if (
+            stage === "ready" && line.includes("readyok")
+          ) {
             clearTimeout(timeout);
-            reject(error);
-          };
+            resolve();
+          } else if (
+            line.startsWith("bestmove ") && activeSearch
+          ) {
+            const job = activeSearch;
+            activeSearch = null;
+            clearTimeout(job.timeout);
 
-          worker.postMessage("uci");
-        });
-      } finally {
-        URL.revokeObjectURL(blobUrl);
-      }
+            const move = line.split(/\s+/)[1];
+
+            if (!move || move === "(none)") {
+              job.reject(new Error("Hamle bulunamadı."));
+            } else {
+              job.resolve(move);
+            }
+          }
+        };
+
+        worker.onerror = function (error) {
+          clearTimeout(timeout);
+
+          if (activeSearch) {
+            clearTimeout(activeSearch.timeout);
+            activeSearch.reject(error);
+            activeSearch = null;
+          }
+
+          reject(error);
+        };
+
+        worker.postMessage("uci");
+      });
 
       return worker;
     })().catch(error => {
-      readyPromise = null;
       if (worker) worker.terminate();
       worker = null;
+      readyPromise = null;
       throw error;
     });
 
     return readyPromise;
   }
 
-  async function bestMove(fen, depth) {
+  function thinkTime() {
+    const level = Number(
+      document.getElementById("level")?.value || 3
+    );
+
+    return [0, 2000, 3500, 5000, 8000, 12000][
+      Math.max(1, Math.min(5, level))
+    ];
+  }
+
+  async function bestMove(fen, milliseconds) {
     const engine = await startEngine();
 
     return new Promise((resolve, reject) => {
       if (activeSearch) {
-        reject(new Error("Önceki analiz devam ediyor."));
+        reject(new Error("Analiz devam ediyor."));
         return;
       }
 
-      activeSearch = { resolve, reject };
+      const job = {
+        resolve,
+        reject,
+        timeout: setTimeout(() => {
+          activeSearch = null;
+          reject(new Error("Analiz zaman aşımı."));
+        }, milliseconds + 60000)
+      };
+
+      activeSearch = job;
+
       engine.postMessage("position fen " + fen);
-      engine.postMessage("go depth " + depth);
+      engine.postMessage("go movetime " + milliseconds);
     });
   }
-
-  function searchDepth() {
-  const level = Number(
-    document.getElementById("level")?.value || 3
-  );
-
-  return [0, 10, 14, 18, 22, 24][
-    Math.max(1, Math.min(5, level))
-  ];
-}
 
   window.computerMove = async function () {
     if (!game || game.game_over() || game.turn() !== "b") return;
@@ -131,7 +168,7 @@
     draw();
 
     try {
-      const uci = await bestMove(game.fen(), searchDepth());
+      const uci = await bestMove(game.fen(), thinkTime());
 
       if (token !== gameToken || game.turn() !== "b") return;
 
@@ -169,7 +206,7 @@
 
       if (typeof coachMessage === "function") {
         coachMessage(
-          "Stockfish kullanılamadı. Mevcut motor devreye giriyor."
+          "Yeni motor kullanılamadı. Eski motor devreye giriyor."
         );
       }
 
@@ -190,12 +227,12 @@
     if (button) button.disabled = true;
 
     analysisBusy = true;
-    coachMessage("Stockfish en iyi hamleyi hesaplıyor...");
+    coachMessage("Stockfish en iyi hamleyi derinlemesine hesaplıyor...");
 
     try {
       const uci = await bestMove(
         game.fen(),
-        Math.max(12, searchDepth())
+        Math.max(10000, thinkTime())
       );
 
       if (token !== gameToken || game.turn() !== "w") return;
@@ -227,9 +264,9 @@
       coachMessage(message);
 
     } catch (error) {
-      if (token === gameToken) {
+      if (token === gameToken && fallbackGetHint) {
         analysisBusy = false;
-        if (fallbackGetHint) fallbackGetHint();
+        fallbackGetHint();
       }
     } finally {
       if (token === gameToken) {
