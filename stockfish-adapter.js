@@ -130,7 +130,7 @@
       document.getElementById("level")?.value || 3
     );
 
-    return [0, 2000, 3500, 5000, 8000, 12000][
+    return [0, 2000, 5000, 8000, 12000, 20000][
       Math.max(1, Math.min(5, level))
     ];
   }
