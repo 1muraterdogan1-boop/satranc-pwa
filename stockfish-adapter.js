@@ -309,10 +309,13 @@
 
       coachMessage(message);
 
-    } catch (error) {
-      if (token === gameToken && fallbackGetHint) {
+        } catch (error) {
+      if (token === gameToken) {
         analysisBusy = false;
-        fallbackGetHint();
+        coachMessage(
+          "Stockfish hata verdi: " +
+          (error.message || error)
+        );
       }
     } finally {
       if (token === gameToken) {
