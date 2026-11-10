@@ -245,10 +245,24 @@
     }
   };
 
-  window.getHint = async function () {
-    if (!game || game.game_over() ||
-        game.turn() !== "w" || thinking || analysisBusy) {
-      if (fallbackGetHint) fallbackGetHint();
+    window.getHint = async function () {
+    if (!game) {
+      coachMessage("Hata: Oyun yüklenmemiş.");
+      return;
+    }
+
+    if (game.game_over()) {
+      coachMessage("Oyun bitmiş. Yeni oyun başlat.");
+      return;
+    }
+
+    if (game.turn() !== "w") {
+      coachMessage("Şu anda siyahın sırası. Beyazın sırasını bekle.");
+      return;
+    }
+
+    if (thinking || analysisBusy) {
+      coachMessage("Motor şu anda başka bir işlem yapıyor. Biraz bekle.");
       return;
     }
 
