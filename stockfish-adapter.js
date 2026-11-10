@@ -118,6 +118,8 @@
             clearTimeout(job.timeout);
 
             const move = line.split(/\s+/)[1];
+            lastAnalysis = Object.values(job.lines)
+  .sort((a, b) => a.index - b.index);
 
             if (!move || move === "(none)") {
               job.reject(new Error("Hamle bulunamadı."));
