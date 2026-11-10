@@ -4,12 +4,13 @@
 
   const CACHE_NAME = "satranc-stockfish-engine-v1";
 
-  
+
 const REMOTE_JS =
-  "https://cdn.jsdelivr.net/npm/stockfish@19.0.1/bin/stockfish-19-single.js";
+  "https://unpkg.com/stockfish@19.0.1/bin/stockfish-19-single.js";
 
 const REMOTE_WASM =
-  "https://cdn.jsdelivr.net/npm/stockfish@19.0.1/bin/stockfish-19-single.wasm";
+  "https://unpkg.com/stockfish@19.0.1/bin/stockfish-19-single.wasm";
+
 
 
   const LOCAL_JS = new URL(
