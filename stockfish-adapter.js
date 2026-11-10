@@ -24,6 +24,7 @@
   let worker = null;
   let readyPromise = null;
   let activeSearch = null;
+  let lastAnalysis = [];
 
   async function saveEngineFile(cache, remote, local, name) {
     let saved = await cache.match(local);
