@@ -84,7 +84,33 @@
           ) {
             clearTimeout(timeout);
             resolve();
-          } else if (
+                   } else if (
+            line.startsWith("info ") && activeSearch
+          ) {
+            const depth = Number(
+              line.match(/\bdepth (\d+)/)?.[1] || 0
+            );
+            const index = Number(
+              line.match(/\bmultipv (\d+)/)?.[1] || 1
+            );
+            const scoreMatch = line.match(
+              /\bscore (cp|mate) (-?\d+)/
+            );
+            const pvMatch = line.match(/\bpv (.+)$/);
+
+            if (scoreMatch && pvMatch) {
+              const previous = activeSearch.lines[index];
+
+              if (!previous || depth >= previous.depth) {
+                activeSearch.lines[index] = {
+                  index,
+                  depth,
+                  type: scoreMatch[1],
+                  score: Number(scoreMatch[2]),
+                  pv: pvMatch[1].trim()
+                };
+              }
+            } } else if (
             line.startsWith("bestmove ") && activeSearch
           ) {
             const job = activeSearch;
