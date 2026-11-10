@@ -172,9 +172,10 @@
         return;
       }
 
-      const job = {
+            const job = {
         resolve,
         reject,
+        lines: {},
         timeout: setTimeout(() => {
           activeSearch = null;
           reject(new Error("Analiz zaman aşımı."));
