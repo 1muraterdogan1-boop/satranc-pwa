@@ -290,6 +290,21 @@
         " (" + best.san + ").";
 
       if (best.captured) message += " Taş kazanıyorsun.";
+            if (lastAnalysis.length) {
+        message += "\n\nStockfish'in 3 aday analizi:";
+
+        lastAnalysis.forEach((item, i) => {
+          const evaluation = item.type === "mate"
+            ? "Zorunlu mat: " + item.score
+            : "Değerlendirme: " +
+              (item.score > 0 ? "+" : "") +
+              (item.score / 100).toFixed(2);
+
+          message += "\n" + (i + 1) + ". " +
+            item.pv.split(/\s+/).slice(0, 4).join(" ") +
+            " — " + evaluation;
+        });
+      }
       if (best.san.includes("+")) message += " Şah tehdidi!";
 
       coachMessage(message);
