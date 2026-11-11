@@ -130,14 +130,24 @@ const REMOTE_WASM =
           }
         };
 
-        worker.onerror = function (error) {
-          clearTimeout(timeout);
+        
+worker.onerror = function (error) {
+  clearTimeout(timeout);
 
-          if (activeSearch) {
-            clearTimeout(activeSearch.timeout);
-            activeSearch.reject(error);
-            activeSearch = null;
-          }
+  const detail =
+    error.message ||
+    error.type ||
+    "Worker yüklenemedi";
+
+  if (activeSearch) {
+    clearTimeout(activeSearch.timeout);
+    activeSearch.reject(new Error(detail));
+    activeSearch = null;
+  }
+
+  reject(new Error(detail));
+};
+
 
           reject(error);
         };
