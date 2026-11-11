@@ -78,7 +78,7 @@ const REMOTE_WASM =
           if (stage === "uci" && line.includes("uciok")) {
             stage = "ready";
             worker.postMessage("setoption name Hash value 64");
-            worker.postMessage("setoption name MultiPV value 3");
+            worker.postMessage("setoption name MultiPV value 1");
             worker.postMessage("isready");
           } else if (
             stage === "ready" && line.includes("readyok")
