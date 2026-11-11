@@ -149,8 +149,6 @@ worker.onerror = function (error) {
 };
 
 
-          reject(error);
-        };
 
         worker.postMessage("uci");
       });
