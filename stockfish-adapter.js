@@ -175,6 +175,7 @@ worker.onerror = function (error) {
   }
 
   async function bestMove(fen, milliseconds) {
+    lastAnalysis = [];
     const engine = await startEngine();
 
     return new Promise((resolve, reject) => {
