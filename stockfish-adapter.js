@@ -3,13 +3,11 @@
   "use strict";
 
   const CACHE_NAME = "satranc-stockfish-engine-v1";
-
-
 const REMOTE_JS =
-  "https://unpkg.com/stockfish@19.0.1/bin/stockfish-19-single.js";
+  "https://unpkg.com/stockfish@19.0.1/stockfish-19-single.js";
 
 const REMOTE_WASM =
-  "https://unpkg.com/stockfish@19.0.1/bin/stockfish-19-single.wasm";
+  "https://unpkg.com/stockfish@19.0.1/stockfish-19-single.wasm";
 
 
 
