@@ -1,5 +1,5 @@
 
-const CACHE_NAME = "satranc-pwa-v11";
+const CACHE_NAME = "satranc-pwa-v12";
 const ENGINE_CACHE = "satranc-stockfish-engine-v1";
 
 const FILES = [
