@@ -1,5 +1,5 @@
 
-const CACHE_NAME = "satranc-pwa-v16";
+const CACHE_NAME = "satranc-pwa-v17";
 const ENGINE_CACHE = "satranc-stockfish-engine-v1";
 
 const FILES = [
@@ -51,10 +51,12 @@ self.addEventListener("fetch", event => {
         .then(response => {
           if (response.ok) {
             const copy = response.clone();
+
             caches.open(CACHE_NAME).then(cache => {
               cache.put(event.request, copy);
             });
           }
+
           return response;
         })
         .catch(() => {
