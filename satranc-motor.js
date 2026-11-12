@@ -370,4 +370,22 @@
 
     runIteration();
   };
+    // Kullanılmayan hamle önerisi arayüzünü kaldır.
+  const hintButton = document.getElementById("hintButton");
+  if (hintButton) hintButton.remove();
+
+  // Eski ipucu fonksiyonunu erişilemez yap.
+  window.getHint = undefined;
+
+  // Eğitmen metnindeki eski düğme yönlendirmesini temizle.
+  const originalCoachMessage = window.coachMessage;
+  if (typeof originalCoachMessage === "function") {
+    window.coachMessage = function (message) {
+      const cleanMessage = String(message || "").replace(
+        "Ayrıntılı öneri için düğmeye bas.",
+        "Bilgisayarın seviyesini seçerek zorluk derecesini değiştirebilirsin."
+      );
+      originalCoachMessage(cleanMessage);
+    };
+  }
 })();
