@@ -199,7 +199,6 @@ function newGame(){
  gameToken++;game=new Chess();selected=null;legal=[];thinking=false;lastMove=null;hintMove=null;
  moveAnalysis=[];analysisBusy=false;capturedWhite=[];capturedBlack=[];
  document.getElementById("report").style.display="none";
- document.getElementById("hintButton").disabled=false;
  say("");updateCaptured();
  coachMessage("Oyun başladı! Merkezi kontrol et, at ve fillerini geliştir, şahını koru.");
  sound("start");draw();
