@@ -357,7 +357,7 @@ function updateCoach(){
  if(game.in_checkmate())coachMessage("Şah mat! Maç sonu analizini aşağıda inceleyebilirsin.");
  else if(game.in_draw()||game.in_stalemate())coachMessage("Oyun berabere. Maç sonunda hamlelerini inceleyebilirsin.");
  else if(game.in_check())coachMessage("Dikkat! Şah tehdit altında. Şahını güvenli yere taşı, saldırıyı engelle veya saldıran taşı al.");
- else if(game.turn()==="w"&&!thinking)coachMessage("İpucu: Merkezi kontrol et, at ve fillerini geliştir, şahını rokla koru. Ayrıntılı öneri için düğmeye bas.");
+ else if(game.turn()==="w"&&!thinking)coachMessage("Merkezi kontrol et, at ve fillerini geliştir, şahını rokla koru.");
  else coachMessage("Bilgisayarın hamlesini incele. Rakibinin tehdidini ve taşlarının güvenliğini kontrol et.");
 }
 function computerMove(){
