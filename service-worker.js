@@ -1,5 +1,5 @@
 
-const CACHE_NAME = "satranc-pwa-v15";
+const CACHE_NAME = "satranc-pwa-v16";
 const ENGINE_CACHE = "satranc-stockfish-engine-v1";
 
 const FILES = [
@@ -10,6 +10,7 @@ const FILES = [
   "./satranc-eklentisi.js",
   "./satranc-motor.js",
   "./stockfish-adapter.js",
+  "./kalici-kayit.js",
   "./icon-192.png",
   "./icon-512.png"
 ];
@@ -46,23 +47,28 @@ self.addEventListener("fetch", event => {
     caches.match(event.request).then(cached => {
       if (cached) return cached;
 
-      return fetch(event.request).then(response => {
-        if (response.ok) {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(event.request, copy);
+      return fetch(event.request)
+        .then(response => {
+          if (response.ok) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then(cache => {
+              cache.put(event.request, copy);
+            });
+          }
+          return response;
+        })
+        .catch(() => {
+          if (event.request.mode === "navigate") {
+            return caches.match("./index.html");
+          }
+
+          return new Response("İnternet bağlantısı yok.", {
+            status: 503,
+            headers: {
+              "Content-Type": "text/plain; charset=utf-8"
+            }
           });
-        }
-        return response;
-      }).catch(() => {
-        if (event.request.mode === "navigate") {
-          return caches.match("./index.html");
-        }
-        return new Response("İnternet bağlantısı yok.", {
-          status: 503,
-          headers: {"Content-Type": "text/plain; charset=utf-8"}
         });
-      });
     })
   );
 });
